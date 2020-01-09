@@ -1,4 +1,4 @@
-This is the old legacy version in alpha state, use the glasses-viewer-integration branch (default) instead, unless you need to rerun old analyses with this version.
+**N.B.This is the old legacy version in alpha state, use the glasses-viewer-integration branch (default) instead, unless you need to rerun old analyses with this version.**
 
 GazeCode
 
