@@ -1,4 +1,6 @@
-GazeCode (alpha version)
+This is the old legacy version in alpha state, use the glaases-viewer-integration branch (default) instead unless you need to rerun old analyses with this version
+
+GazeCode
 
 This software allows for fast and flexible manual classification of any
 mobile eye-tracking data. Currently Pupil Labs and Tobii Pro Glasses data 
