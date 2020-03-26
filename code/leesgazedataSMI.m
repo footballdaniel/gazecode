@@ -6,7 +6,7 @@ if fid == -1
     error(message);
 end
 
-firstskip = 16;                           % to skip header unitl calibration info
+firstskip = 15;                           % to skip header unitl calibration info
 for p=1:firstskip,
     fgetl(fid);
 end
@@ -20,9 +20,7 @@ for p=1:secondskip,
     fgetl(fid);
 end
 
-
-dummy = textscan(fid,'%f%s%f%f%f%f%f%f%f%f%f%f%f%s%f%f%f%f%f%f%f%f%f%f%f%f','delimiter','\t');
-fclose(fid);
+dummy = textscan(fid,'%f%s%s%s%s%s%s%s%s%f%f%f%f%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s','delimiter','\t');
 
 tijd            = dummy{:,1};
 % time needs to be set to zero and is in microseconds!
@@ -32,25 +30,17 @@ tijd2(1)        = 0;
 
 tijd = tijd2;
 
-leftx           = dummy{:,10};
+% Convert values to double array
+x           = cellfun(@str2num,dummy{:,4});
 % correct for data that is beyond the world camera
-leftx(leftx<0)      = NaN;
-leftx(leftx>wcr(1)) = NaN;
-lefty           = dummy{:,11};
-% correct for data that is beyond the world camera
-lefty(lefty<0)      = NaN;
-lefty(lefty>wcr(2)) = NaN;
+x(x<0)      = NaN;
+x(x>wcr(1)) = NaN;
 
-rightx          = dummy{:,12};
+% Convert values to double array
+y           = cellfun(@str2num,dummy{:,5});
 % correct for data that is beyond the world camera
-rightx(rightx<0)      = NaN;
-rightx(rightx>wcr(1)) = NaN;
-righty          = dummy{:,13};
-% correct for data that is beyond the world camera
-righty(righty<0)      = NaN;
-righty(righty>wcr(2)) = NaN;
 
-x               = nanmean([leftx,rightx],2);
-y               = nanmean([lefty,righty],2);
+y(y<0)      = NaN;
+y(y>wcr(2)) = NaN;
 
 disp(sprintf('%d lines of file %s processed',length(tijd),filenaam));
