@@ -75,6 +75,7 @@ gv.cat7but = {'7','numpad7'};
 gv.cat8but = {'8','numpad8'};
 gv.cat9but = {'9','numpad9'};
 gv.catjbut = 'j';
+gv.timejbut = 't';
 
 
 %% directories and settings
@@ -276,7 +277,10 @@ set(lp,'Position',[1+pmarhn 1+pmar(2) panelWidth(1) hmymax-2*pmar(2)]);
 lpsize = get(lp,'Position');
 lpsize = lpsize(3:end);
 
-
+jknop = uicontrol(lp,'Style','pushbutton','string','J','callback',@jumptotime,'userdata',gv.timejbut);
+set(jknop,'position',[(lpsize(1)/2)-(knopsizeL(1)/2) knopmar(2) knopsizeL]);
+% set(fwknop,'backgroundcolor',[1 0.5 0]);
+set(jknop,'fontsize',20);
 
 fwknop = uicontrol(lp,'Style','pushbutton','string','>>','callback',@playforward,'userdata',gv.fwdbut);
 set(fwknop,'position',[lpsize(1)-knopsizeL(1)-knopmar(1) knopmar(2) knopsizeL]);
@@ -777,6 +781,46 @@ end
 set(hm,'userdata',gv);
 end
 
+function jumptotime(src,evt)
+
+lp = get(src,'parent');
+hm = get(lp,'parent');
+gv = get(hm,'userdata');
+
+prompt = {'HH:','MM:','SS:'};
+dlgtitle = 'Jump to fixation at time';
+dims = [1 3];
+definput = {'00','00','00'};
+answer = inputdlg(prompt,dlgtitle,dims,definput);
+if isempty(answer),return,end % Check for user input
+if length(cat(2,answer{:})) ~= 6 % Check if input format was correct
+    disp('Warning: Specify time input with [HH:MM:SS]')
+    return
+end 
+if ~isnumeric(str2num(cell2mat(answer))) % Check if input is numeric
+    disp('Only numbers allowed')
+    welkefix = gv.curfix;
+else
+    % Convert input to miliseconds
+    jump_to_MS =(str2num(answer{3})*1000) + ...
+        (str2num(answer{2})*60*1000) + (str2num(answer{1})*60*60*1000);
+    
+    % find the next upcoming fixation
+    welkefix = find(gv.data(:,2) > jump_to_MS,1);
+end
+
+if isempty(welkefix)|| welkefix < 1 || welkefix > gv.maxfix
+    disp('Wrong input! Time lies outside the data');
+    return
+else
+    gv.curfix = welkefix;
+    set(src,'userdata',gv);
+    showmainfr(src,gv);
+end
+
+% set(hm,'userdata',gv);
+end
+        
 % function move one fixation back, function of button in left panel
 function playback(src,evt)
 lp = get(src,'parent');
