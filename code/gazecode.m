@@ -76,6 +76,7 @@ gv.cat8but = {'8','numpad8'};
 gv.cat9but = {'9','numpad9'};
 gv.catjbut = 'j';
 gv.timejbut = 't';
+gv.jbut = 't';
 
 
 %% directories and settings
@@ -782,7 +783,6 @@ set(hm,'userdata',gv);
 end
 
 function jumptotime(src,evt)
-
 lp = get(src,'parent');
 hm = get(lp,'parent');
 gv = get(hm,'userdata');
@@ -818,7 +818,7 @@ else
     showmainfr(src,gv);
 end
 
-% set(hm,'userdata',gv);
+set(hm,'userdata',gv);
 end
         
 % function move one fixation back, function of button in left panel
@@ -840,6 +840,8 @@ end
 function verwerkknop(src,evt)
 gv = get(src,'userdata');
 switch evt.Key
+    case gv.jbut
+        jumptotime(findobj('UserData',gv.fwdbut),evt);
     case gv.fwdbut
         playforward(findobj('UserData',gv.fwdbut),evt);
     case gv.bckbut
