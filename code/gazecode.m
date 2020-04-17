@@ -60,6 +60,7 @@ gv.minframe     = 1;
 gv.maxframe     = 1;
 gv.curfix       = 1;
 gv.maxfix       = 1;
+gv.displaygaze  = 1;
 skipdataload    = false;
 
 % buttons
@@ -257,6 +258,7 @@ mm1         = uimenu(hm,'Label','Menu');
 % sub menu of main menu 1
 sm0         = uimenu(mm1,'Label','Save to text','CallBack',@savetotext);
 sm1         = uimenu(mm1,'Label','About GazeCode','CallBack','uiwait(msgbox(''This is version 1.0.1'',''About FixLabel''))');
+sm2         = uimenu(mm1,'Label','Toggle Gaze overlay','CallBack',@togglespit);
 
 % first get sizes of panels
 pmar        = [50 20];
@@ -737,9 +739,13 @@ disp(['Current fixation: ', num2str(gv.curfix),'/',num2str(gv.maxfix)]);
 
 set(gv.lp,'Title',['Current fixation: ' num2str(gv.curfix),'/',num2str(gv.maxfix) ]);
 hold(gv.frameas,'on');
-stip = scatter(gv.fixxpos(gv.curfix),gv.fixypos(gv.curfix),1000,'ro');
-set(stip,'MarkerEdgeColor',[0 0.85 1],'MarkerFaceAlpha',.65,'MarkerFaceColor',[0 0.85 1],'LineWidth',2);
 
+% Check if overlaying gaze is toggled
+if gv.displaygaze == 1
+    % Create a blue circle on top of current fixation point
+    stip = scatter(gv.fixxpos(gv.curfix),gv.fixypos(gv.curfix),1000,'ro');
+    set(stip,'MarkerEdgeColor',[0 0.85 1],'MarkerFaceAlpha',.65,'MarkerFaceColor',[0 0.85 1],'LineWidth',2);
+end
 
 hold(gv.frameas,'off');
 setlabel(gv);
@@ -881,6 +887,20 @@ switch evt.Key
         % disp('Unknown key pressed');
 end
 
+end
+
+% function to 
+function togglespit(src,evt)
+disp('Toggle gaze visibility');
+
+mm1 = get(src,'parent');
+hm = get(mm1,'parent');
+gv = get(hm,'userdata');
+
+% Toggle true / false
+gv.displaygaze = ~gv.displaygaze
+
+set(hm,'userdata',gv);
 end
 
 function savetotext(src,evt)
