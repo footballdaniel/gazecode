@@ -12,7 +12,7 @@ switch eyetracker
     case 'Pupil Labs'               % experimental, settings not thoroughly tested
         f.thr           = 5000;     % set very high
         f.counter       = 200;
-        f.minfix        = 60;       % ms
+        f.minfix        = 120;       % ms
         f.lambda        = 4;        % lambda rel treshhold in sd's
         f.windowlength  = 8000;     % ms moving window average
         f.sf            = 50;       % sampling freq
@@ -20,7 +20,7 @@ switch eyetracker
     case 'SMI Glasses'              % experimental, settings not thoroughly tested
         f.thr           = 5000;     % set very high
         f.counter       = 200;
-        f.minfix        = 60;       % ms
+        f.minfix        = 120;       % ms
         f.lambda        = 4;        % lambda rel treshhold in sd's
         f.windowlength  = 8000;     % ms moving window average
         f.sf            = 50;       % sampling freq

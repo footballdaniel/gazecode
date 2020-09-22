@@ -439,9 +439,6 @@ if ~skipdataload
             disp('Determining fixations...');
             gv.fmark = fixdetectmovingwindow(gv.datx,gv.daty,gv.datt,gv);
             
-            disp('Determining fixations...');
-            % gv.fmark = fixdetect(gv.datx,gv.daty,gv.datt,gv);
-            gv.fmark = fixdetectmovingwindow(gv.datx,gv.daty,gv.datt,gv);
         case 'Positive Science'
             cd(gv.foldnaam);
             disp('Select data file with gaze positions');
@@ -726,6 +723,23 @@ setlabel(gv);
 set(hm,'userdata',gv);
 end
 
+% Funciton to get the current time from the video / text
+% Function to get the current time from the video / text
+function [time, duration] = getvideotime(gv)
+% The frame of the start of a fixation
+time_start_ms = gv.data(gv.curfix,2);
+% Find the current time from video in seconds
+time_curfix_s = time_start_ms/1000;
+% fraction of day (datestr() uses fraction of day as conversion)
+frac = 1 / (24 * 60 * 60);
+% fraction elapsed
+frac_elapsed = frac * time_curfix_s;
+time = datestr(frac_elapsed, 'MM:SS.FFF');
+
+% Now access the duration of this fixation (Units [ms])
+duration= num2str(gv.data(gv.curfix,4));
+end
+
 % function to show the current frame and fixation being labeled
 function showmainfr(hm,gv)
 plaat = read(gv.vidObj,gv.mfr(gv.curfix));
@@ -734,10 +748,12 @@ gv.frameas = gca;
 axis off;
 axis equal;
 
+% Access the video time corresponding to the current fixation
+[time, duration] = getvideotime(gv);
 
-disp(['Current fixation: ', num2str(gv.curfix),'/',num2str(gv.maxfix)]);
+disp(['Current fixation: ', num2str(gv.curfix),'/',num2str(gv.maxfix), ' Time: ', time, ' Duration: ',duration ]);
 
-set(gv.lp,'Title',['Current fixation: ' num2str(gv.curfix),'/',num2str(gv.maxfix) ]);
+set(gv.lp,'Title',['Current fixation: ' num2str(gv.curfix),'/',num2str(gv.maxfix), ' Time: ', time, ' Duration: ', duration]);
 hold(gv.frameas,'on');
 
 % Check if overlaying gaze is toggled
@@ -802,7 +818,7 @@ if isempty(answer),return,end % Check for user input
 if length(cat(2,answer{:})) ~= 6 % Check if input format was correct
     disp('Warning: Specify time input with [HH:MM:SS]')
     return
-end 
+end
 if ~isnumeric(str2num(cell2mat(answer))) % Check if input is numeric
     disp('Only numbers allowed')
     welkefix = gv.curfix;
@@ -826,7 +842,7 @@ end
 
 set(hm,'userdata',gv);
 end
-        
+
 % function move one fixation back, function of button in left panel
 function playback(src,evt)
 lp = get(src,'parent');
@@ -889,7 +905,7 @@ end
 
 end
 
-% function to 
+% function to
 function togglespit(src,evt)
 disp('Toggle gaze visibility');
 
@@ -938,7 +954,7 @@ switch gv.datatype
             else
                 filenaam = fullfile(gv.resdir, answer{1});
             end
-        end   
+        end
 end
 fid = fopen(filenaam,'w+');
 fprintf(fid,[repmat('%s\t',1,12),'%s\n'],'fix nr','fix start (ms)','fix end (ms)','fix dur (ms)','x start','y start','x end','y end','mean x','sd x','mean y','sd y','label');
