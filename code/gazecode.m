@@ -333,9 +333,25 @@ for p = 1:size(gridpos,1)
     set(gv.knoppen(p),'backgroundcolor',[1 1 1]);
     set(gv.knoppen(p),'fontsize',20);
     set(gv.knoppen(p),'userdata',p);
-    imgData = imread([gv.catfoldnaam gv.fs num2str(p) '.png']);
-    imgData = imgData./maxall(imgData);
-    imgData = double(imgData);
+%     imgData = imread([gv.catfoldnaam gv.fs num2str(p) '.png']);
+%     imgData = imgData./maxall(imgData);
+%     imgData = double(imgData);
+      [imgData,cmap,a] = imread([gv.catfoldnaam gv.fs num2str(p) '.png']);
+      if ~isempty(cmap)
+          % if indexed image, turn into normal
+          cmap    = permute(cmap,[1 3 2]);
+          imgData  = reshape(cmap(imdata(:)+1,1,:),[size(imdata) 3]);
+          % don't think this occurs, but be safe in case it does
+          if isa(a,'uint8')
+              a = double(a)/255;
+          end
+      end
+%       imgData          = cat(3,imgData,a);  % add alpha channel, if any
+      if isa(imgData,'uint8')
+          imgData = double(imgData)/255;
+      elseif isa(imgData,'uint16')
+          imgData = double(imgData)/65535;
+      end
     set(gv.knoppen(p),'CData',imgData);
 end
 set(hm,'userdata',gv);
@@ -584,8 +600,8 @@ if ~skipdataload
             gv.daty = data.eye.binocular.gp(sel,2);
             
             gv.datt = gv.datt*1000;
-            gv.datx = gv.datx * data.video.scene.width;
-            gv.daty = gv.daty * data.video.scene.height;
+%             gv.datx = gv.datx * data.video.scene.width;
+%             gv.daty = gv.daty * data.video.scene.height;
             
         otherwise
             disp('Unknown data type, crashing in 3,2,1,...');
@@ -633,7 +649,12 @@ if ~skipdataload
                 gv.data(:,end) = log2(gv.coding.type{gv.coding.outIdx}(qWhich))-1;
                 % added such that if previously coded, GazeCode will pickup at the
                 % last coded event.
-                gv.curfix = find(gv.data(:,end)>1, 1,'last');
+                % JSB: changed for the special case where somebody coded some data,
+                % but then resets all to zero and then closes.
+                wheretocontinue = find(gv.data(:,end)>1, 1,'last');
+                if ~isempty(wheretocontinue) 
+                    gv.curfix = wheretocontinue;
+                end
             end
         otherwise
             % do nothing
@@ -754,6 +775,7 @@ axis equal;
 disp(['Current fixation: ', num2str(gv.curfix),'/',num2str(gv.maxfix), ' Time: ', time, ' Duration: ',duration ]);
 
 set(gv.lp,'Title',['Current fixation: ' num2str(gv.curfix),'/',num2str(gv.maxfix), ' Time: ', time, ' Duration: ', duration]);
+
 hold(gv.frameas,'on');
 
 % Check if overlaying gaze is toggled
